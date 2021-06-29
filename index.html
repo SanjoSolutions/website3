@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="movable.css">
+  <style>
+    :root {
+      --primary: #163F60;
+      --secondary: #F4B1C7;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+      padding-bottom: 15px;
+    }
+
+    .sidebar {
+      width: 260px;
+      flex: 0 0 auto;
+      background-color: var(--primary);
+      padding: 10px 15px;
+      color: white;
+    }
+
+    .logo img {
+      width: 260px;
+    }
+
+    nav {
+      padding: 0 1.5rem;
+      font-family: sans-serif;
+    }
+
+    nav ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav li {
+      display: block;
+      margin: 0.25rem;
+    }
+
+    nav li.active {
+      font-weight: 700;
+    }
+
+    nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    nav a:before, nav a:after {
+      content: '';
+      display: inline-block;
+      border: 1px solid white;
+      width: 4px;
+      height: 1em;
+    }
+
+    nav a:before {
+      float: left;
+    }
+
+    nav a:after {
+      float: right;
+    }
+
+    nav a:hover:before,
+    nav a:hover:after {
+      background-color: white;
+    }
+
+    .main {
+      flex: 1 1 auto;
+      padding: 10px 15px;
+    }
+
+    .main img {
+      display: block;
+      width: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .main img:last-child {
+      margin-bottom: 0;
+    }
+
+    .heart {
+      display: block;
+      margin: 0 auto;
+      width: 50px;
+      color: var(--secondary);
+    }
+
+    @media (max-width: 767.9999999px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: auto;
+      }
+
+      .logo img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .main img {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="logo">
+    <!--<img src="logo.png" alt="Logo">-->
+
+    <nav>
+      <ol>
+        <li class="active">
+          <a href="#">Home</a>
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+<div class="main">
+  <img src="20210502_145420.jpg">
+  <img src="20210502_151156.jpg">
+  <img src="20210502_152256.jpg">
+</div>
+
+<div class="footer">
+  <img class="heart" src="heart.svg">
+</div>
+
+<script type="module">
+  import { initMovable2, movable } from './movable.js'
+
+  if (window.innerWidth >= 768) {
+    initMovable2(document.querySelector('.main'))
+
+    const images = document.querySelectorAll('.main img')
+    images.forEach(function (image) {
+      movable(image)
+
+      let isMovingImage = false
+
+      image.addEventListener('pointerdown', function (event) {
+        console.log('pointerdown', event)
+        isMovingImage = true
+      })
+
+      window.addEventListener('pointermove', function (event) {
+        if (isMovingImage) {
+          const transform = image.style.transform
+          let rotation = 0
+          if (transform) {
+            const match = /rotate\((\d+)deg\)/.exec(transform)
+            rotation = Number(match[1])
+          }
+          rotation += Math.round(0.25 * distance(
+            {x: 0, y: 0},
+            {x: event.movementX, y: event.movementY}
+          ))
+          updateRotation(rotation)
+        }
+      })
+
+      function distance(a, b) {
+        return Math.sqrt(
+          (b.x - a.x) ** 2 +
+          (b.y - a.y) ** 2
+        )
+      }
+
+      function updateRotation(rotation) {
+        const transform = image.style.transform
+        if (transform.includes('rotate')) {
+          image.style.transform = transform.replace(/rotate\(.*?\)/, `rotate(${rotation}deg)`)
+        } else if (transform.length >= 1) {
+          image.style.transform += ` rotate(${rotation}deg)`
+        } else {
+          image.style.transform = `rotate(${rotation}deg)`
+        }
+      }
+
+      window.addEventListener('pointerup', function (event) {
+        isMovingImage = false
+      })
+    })
+  }
+</script>
+</body>
+</html>
